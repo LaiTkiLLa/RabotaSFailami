@@ -41,7 +41,7 @@ def get_shop_list_by_dishes(dishes, persons=int):
                 else:
                     shopping_list.update(items_list)
 
-        print(f"Для приготовления блюд на {persons} человек  нам необходимо купить:")
+        print(f"На {persons} человек нам потребуется:")
         pprint(shopping_list)
     except KeyError:
         print("Вы ошиблись в названии блюда, проверьте ввод")

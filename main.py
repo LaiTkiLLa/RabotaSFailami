@@ -1,45 +1,50 @@
-# Задание №1
+# # Задача №1
 
-import json
+from pprint import pprint
 
-keys = ['ingridient_name', 'quantity', 'measure', ]
-cook_book = {}
+def dict_collector(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file_work:
+        dishes = {}
+        for line in file_work:
+            dish_name = line[:-1]
+            counter = file_work.readline().strip()
+            list_of_ingridient = []
+            for i in range(int(counter)):
+                dish_items = dict.fromkeys(['ingredient_name', 'quantity', 'measure'])
+                ingridient = file_work.readline().strip().split(' | ')
+                dish_items['ingredient_name'] = ingridient[0]
+                dish_items['quantity'] = ingridient[1]
+                dish_items['measure'] = ingridient[2]
+                list_of_ingridient.append(dish_items)
+                cook_book = {dish_name: list_of_ingridient}
+                dishes.update(cook_book)
+            file_work.readline()
 
-with open('dishes_list.txt', encoding='utf-8') as file:
-    lines = []
-    for line in file:
-        line = line.strip()
-        if line:
-            lines.append(line)
-        continue
-    lines = iter(lines)
+    return (dishes)
 
-    for name in lines:
-        cook_book[name] = []
-        num = next(lines)
+dict_collector('dishes_list.txt')
 
-        for _ in range(int(num)):
-            ingridient = next(lines)
-            ing = ingridient.split(' | ')
-            z = zip(keys, ing)
-            ingridient_dict = {k: v for (k, v) in z}
-            cook_book[name].append(ingridient_dict)
-            continue
+# Задача №2
 
-        continue
-print(json.dumps(cook_book, indent=0, ensure_ascii=False))
+def get_shop_list_by_dishes(dishes, persons=int):
 
-# Задание №2
+    menu = dict_collector('dishes_list.txt')
+    shopping_list = {}
+    try:
+        for dish in dishes:
+            for item in (menu[dish]):
+                items_list = dict([(item['ingredient_name'], {'measure': item['measure'], 'quantity': int(item['quantity'])*persons})])
+                if shopping_list.get(item['ingredient_name']):
+                    extra_item = (int(shopping_list[item['ingredient_name']]['quantity']) +
+                                  int(items_list[item['ingredient_name']]['quantity']))
+                    shopping_list[item['ingredient_name']]['quantity'] = extra_item
+                else:
+                    shopping_list.update(items_list)
 
-dishes = input('ВВедите название блюда: \n')
-person_count = int(input('Введите количество персон: \n'))
-def get_shop_list_by_dishes(dishes, person_count):
-    for k,v in cook_book.items():
-        if dishes in k:
-            for ingridients in v:
-                b = (int(ingridients['quantity']) * person_count)
-                ingridients['quantity'] = b
-            return(cook_book[dishes])
+        print(f"Для приготовления блюд на {persons} человек  нам необходимо купить:")
+        pprint(shopping_list)
+    except KeyError:
+        print("Вы ошиблись в названии блюда, проверьте ввод")
 
-print(get_shop_list_by_dishes(dishes, person_count))
 
+get_shop_list_by_dishes(['Омлет', 'Фахитос'], 10)
